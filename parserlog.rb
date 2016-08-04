@@ -1,29 +1,19 @@
 class Parserlog
 
   require 'json'
+  COD_WORLD = "1022"
+
 
   def read_log
-
     file = File.open('games.log', 'r')
     count_game = 0
     new_game = true
-    games = [] 
+    games = []
     game = {}
 
     file.each_line do |line|
       if line.include?('InitGame')
         new_game = true
-
-        puts "inicio" # retirar depois
-        if count_game > 0  
-          for p in game.players
-            puts p.id 
-            puts p.name
-            puts p.kills
-          end
-        end   
-        puts "fim" # retirar depois
-
         count_game = count_game + 1
         game = Game.new(count_game) # criando game com id 
         games << game
@@ -34,16 +24,16 @@ class Parserlog
       end
       new_game = false  
     end 
+    format_json_games(games)
     file.close
   end 
-
 
   def extract_kill_line(line, game)
     kill_dados = line.split("Kill: ")
     assassino = kill_dados[1].split(" ")[0]
     assassinado = kill_dados[1].split(" ")[1]
 
-    if assassino == "1022"
+    if assassino == COD_WORLD
       for play in game.players
         if play.id == assassinado
           play.kills = play.kills - 1
@@ -66,27 +56,17 @@ class Parserlog
     game.add_player(player)
   end   
 
-  # game_1: {
-  #   total_kills: 45;
-  #   players: ["Dono da bola", "Isgalamido", "Zeh"]
-  #   kills: {
-  #     "Dono da bola": 5,
-  #     "Isgalamido": 18,
-  #     "Zeh": 20
-  #   }
-  # }
-
-  def format_json_game(games)
-    kills = []
-    kil = {}
-    #puts line
-
-    my_object = { 
-      :total_kills => "3",
-      :players => ["Dono da bola", "Isgalamido", "Zeh"],
-      :kills => "hashhhh"
+  def format_json_games(games)
+    games_objs = {}
+    for game in games
+      game_obj = { 
+      :total_kills => game.total_kills,
+      :players => game.get_players,
+      kills: game.get_kills_by_player 
     }
-    puts JSON.pretty_generate(my_object)
+    games_objs["game_ #{game.id}"] = game_obj
+    end
+    puts JSON.pretty_generate(games_objs)
   end 
 
 end  
