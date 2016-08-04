@@ -1,21 +1,17 @@
 class Parserlog
 
-  require 'json'
-  COD_WORLD = "1022"
-
-
   def read_log
     file = File.open('games.log', 'r')
     count_game = 0
     new_game = true
-    games = []
     game = {}
+    games = []
 
     file.each_line do |line|
       if line.include?('InitGame')
         new_game = true
-        count_game = count_game + 1
-        game = Game.new(count_game) # criando game com id 
+        count_game += 1
+        game = Game.new(count_game) 
         games << game
       elsif line.include?('ClientUserinfoChanged')
         extract_player_config(line, game)
@@ -24,49 +20,65 @@ class Parserlog
       end
       new_game = false  
     end 
-    format_json_games(games)
     file.close
+    return games
   end 
+
+  def print_games
+    games = read_log
+    puts format_json_games(games)
+  end 
+
+  # def print_rank_geral
+  #   games = read_log
+  #   puts games
+  #   players_ranking = []
+  #   for game in games
+  #     calcula_kills(players_ranking, game)
+  #   end 
+  #    puts players_ranking
+  # end
+
+  # def calcula_kills(players_ranking, game)
+  #   for play in game.players
+
+       
+  #   end
+
+  # end 
+
+
 
   def extract_kill_line(line, game)
     kill_dados = line.split("Kill: ")
-    assassino = kill_dados[1].split(" ")[0]
-    assassinado = kill_dados[1].split(" ")[1]
-
-    if assassino == COD_WORLD
-      for play in game.players
-        if play.id == assassinado
-          play.kills = play.kills - 1
-        end  
-      end  
-    else
-      for play in game.players
-        if play.id == assassino
-          play.kills = play.kills + 1
-        end
-      end  
-    end  
+    cod_killer = kill_dados[1].split(" ")[0]
+    cod_killed = kill_dados[1].split(" ")[1]
+    game.process_kill(cod_killer, cod_killed, game)
   end
     
-  def extract_player_config(line, game)
-    config_user = line.split("ClientUserinfoChanged: ")
-    id = config_user[1].split(" ")[0]
-    name = config_user[1].split('\\')[1]
+  def process_player(id, name, game)
     player = Player.new(id, name)
     game.add_player(player)
+  end   
+
+  def extract_player_config(line, game)
+    user = line.split("ClientUserinfoChanged: ")
+    id = user[1].split(" ")[0]
+    name = user[1].split('\\')[1]
+    process_player(id, name, game)
   end   
 
   def format_json_games(games)
     games_objs = {}
     for game in games
       game_obj = { 
-      :total_kills => game.total_kills,
-      :players => game.get_players,
-      kills: game.get_kills_by_player 
-    }
-    games_objs["game_ #{game.id}"] = game_obj
+        :total_kills => game.total_kills,
+        :players => game.get_players,
+        kills: game.get_kills_by_player 
+      }
+      games_objs["game_ #{game.id}"] = game_obj
     end
-    puts JSON.pretty_generate(games_objs)
+    return JSON.pretty_generate(games_objs)
   end 
 
 end  

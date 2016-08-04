@@ -1,13 +1,31 @@
 class Game
 
   attr_accessor :id, :players
-  
+  COD_WORLD_KILLER = "1022"
 
   def initialize(id)
     @id = id
     @players = []
-  end  
+  end
 
+  def process_kill(cod_killer, cod_killed, game)
+    if cod_killer == COD_WORLD_KILLER
+      for play in game.players
+        if play.id == cod_killed
+          play.kills = play.remove_kill
+        end  
+      end  
+    else
+      for play in game.players
+        if play.id == cod_killer
+          play.kills = play.add_kill
+        end
+      end  
+    end
+  end 
+
+  
+  
   def add_player(player)
     if exists(player)
       update(player)
