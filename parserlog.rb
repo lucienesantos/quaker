@@ -29,9 +29,9 @@ class Parserlog
     puts format_json_games(games)
   end 
 
-  # def print_rank_geral
-  #   games = read_log
-  #   puts games
+  def print_rank_geral
+    games = read_log
+     puts games
   #   players_ranking = []
   #   for game in games
   #     calcula_kills(players_ranking, game)
@@ -45,7 +45,7 @@ class Parserlog
        
   #   end
 
-  # end 
+  end 
 
 
 
@@ -70,14 +70,14 @@ class Parserlog
 
   def format_json_games(games)
     games_objs = {}
-    for game in games
+    games.select { |game|
       game_obj = { 
         :total_kills => game.total_kills,
         :players => game.get_players,
         kills: game.get_kills_by_player 
       }
       games_objs["game_ #{game.id}"] = game_obj
-    end
+    }
     return JSON.pretty_generate(games_objs)
   end 
 

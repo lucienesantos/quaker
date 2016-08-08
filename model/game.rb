@@ -10,22 +10,20 @@ class Game
 
   def process_kill(cod_killer, cod_killed, game)
     if cod_killer == COD_WORLD_KILLER
-      for play in game.players
-        if play.id == cod_killed
-          play.kills = play.remove_kill
+      game.players.select { |player| 
+        if player.id == cod_killed
+          player.kills = player.remove_kill
         end  
-      end  
+      }  
     else
-      for play in game.players
-        if play.id == cod_killer
-          play.kills = play.add_kill
+      game.players.select { |player|
+        if player.id == cod_killer
+          player.kills = player.add_kill
         end
-      end  
+      }
     end
   end 
 
-  
-  
   def add_player(player)
     if exists(player)
       update(player)
@@ -36,17 +34,17 @@ class Game
 
   def total_kills 
     total_kills = 0
-    for play in players
-      total_kills += play.kills
-    end  
+    players.select { |player|
+      total_kills += player.kills
+    } 
     return total_kills
   end  
 
   def get_players
     players_formated = []
-    for play in players
-      players_formated << play.name
-    end  
+    players.select { |player|
+      players_formated << player.name
+    }  
     return players_formated
   end 
 
@@ -57,9 +55,9 @@ class Game
 #     }
   def get_kills_by_player
     kills = {}
-    for play in players
-      kills[play.name] = play.kills
-    end
+    players.select { |player|
+      kills[player.name] = player.kills
+    }
     return kills
   end 
 
@@ -68,20 +66,20 @@ class Game
   end  
 
   def update(player)
-    for p in players
+    players.select { |p|
       if p.id == player.id
         p.name = player.name
       end 
-    end
+    }
   end
 
   def exists(player)
     if players.size > 0
-      for p in players
+      players.select { |p|
         if p.id.eql? player.id
           return true
         end 
-      end
+      }
       return false 
     else
       return false 
