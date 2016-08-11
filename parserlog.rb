@@ -29,31 +29,52 @@ class Parserlog
     puts format_json_games(games)
   end 
 
-  def print_rank_geral
+  def rank_geral
     games = read_log
-     puts games
-  #   players_ranking = []
-  #   for game in games
-  #     calcula_kills(players_ranking, game)
-  #   end 
-  #    puts players_ranking
-  # end
-
-  # def calcula_kills(players_ranking, game)
-  #   for play in game.players
-
-       
-  #   end
-
+    players_ranking = []
+    games.select { |game|
+      game.players.select { |player|
+        if player.exists_by_name(player, players_ranking)
+          players_ranking.select { |p|
+            if p.name == player.name
+              p.kills += player.kills
+            end  
+          }
+        else
+          players_ranking << player
+        end  
+      }
+    }
+    return players_ranking
   end 
 
+  def kills_players_by_game
+    games = read_log
+    games.select { |game|
+      puts "GAME_#{game.id}"
+      game.players.each { |player|
+        puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+      }
+    }
+  end 
 
+  def kills_players_total
+    players_total = rank_geral
+    players_total.select { |player|
+      puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+    }
+  end
+    
+  def print_rank_geral
+    kills_players_total
+    kills_players_by_game
+  end  
 
   def extract_kill_line(line, game)
     kill_dados = line.split("Kill: ")
     cod_killer = kill_dados[1].split(" ")[0]
     cod_killed = kill_dados[1].split(" ")[1]
-    game.process_kill(cod_killer, cod_killed, game)
+    game.process_kill(cod_killer, cod_killed)
   end
     
   def process_player(id, name, game)

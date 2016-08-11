@@ -8,15 +8,15 @@ class Game
     @players = []
   end
 
-  def process_kill(cod_killer, cod_killed, game)
+  def process_kill(cod_killer, cod_killed)
     if cod_killer == COD_WORLD_KILLER
-      game.players.select { |player| 
+      self.players.select { |player| 
         if player.id == cod_killed
           player.kills = player.remove_kill
         end  
       }  
     else
-      game.players.select { |player|
+      self.players.select { |player|
         if player.id == cod_killer
           player.kills = player.add_kill
         end
@@ -33,11 +33,9 @@ class Game
   end 
 
   def total_kills 
-    total_kills = 0
-    players.select { |player|
+    players.inject(0){|total_kills, player|
       total_kills += player.kills
-    } 
-    return total_kills
+    }
   end  
 
   def get_players
