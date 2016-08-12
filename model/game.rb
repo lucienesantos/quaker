@@ -38,24 +38,13 @@ class Game
     }
   end  
 
-  def get_players
-    players_formated = []
-    players.select { |player|
-      players_formated << player.name
-    }  
-    return players_formated
+  def players_formated
+    players.map { |player| player.name }    
   end 
 
-# kills: {
-#       "Dono da bola": 5,
-#       "Isgalamido": 18,
-#       "Zeh": 20
-#     }
   def kills_by_player
     kills = {}
-    players.select { |player|
-      kills[player.name] = player.kills
-    }
+    players.each { |player| kills[player.name] = player.kills }
     return kills
   end 
 
@@ -64,11 +53,7 @@ class Game
   end  
 
   def update(player)
-    players.select { |p|
-      if p.id == player.id
-        p.name = player.name
-      end 
-    }
+    players.find { |p| p.id == player.id }.name  = player.name
   end
 
   def exists(player)

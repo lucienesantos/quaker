@@ -5,5 +5,4 @@ require File.expand_path('parserlog.rb')
 
  
  b = Parserlog.new
- b.print_rank_geral
- 
+ b.print_games

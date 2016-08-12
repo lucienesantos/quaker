@@ -91,10 +91,10 @@ class Parserlog
 
   def format_json_games(games)
     games_objs = {}
-    games.select { |game|
+    games.each { |game|
       game_obj = { 
         :total_kills => game.total_kills,
-        :players => game.get_players,
+        :players => game.players_formated,
         kills: game.kills_by_player 
       }
       games_objs["game_ #{game.id}"] = game_obj
