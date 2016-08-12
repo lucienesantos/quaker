@@ -51,7 +51,7 @@ class Game
 #       "Isgalamido": 18,
 #       "Zeh": 20
 #     }
-  def get_kills_by_player
+  def kills_by_player
     kills = {}
     players.select { |player|
       kills[player.name] = player.kills
@@ -72,16 +72,7 @@ class Game
   end
 
   def exists(player)
-    if players.size > 0
-      players.select { |p|
-        if p.id.eql? player.id
-          return true
-        end 
-      }
-      return false 
-    else
-      return false 
-    end
+    players.select { |p| p.id.eql? player.id }.any?
   end  
 
 end

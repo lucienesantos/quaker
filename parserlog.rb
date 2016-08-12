@@ -95,7 +95,7 @@ class Parserlog
       game_obj = { 
         :total_kills => game.total_kills,
         :players => game.get_players,
-        kills: game.get_kills_by_player 
+        kills: game.kills_by_player 
       }
       games_objs["game_ #{game.id}"] = game_obj
     }
