@@ -1,32 +1,37 @@
 class Parserlog
 
-  def read_log
-    file = File.open('games.log', 'r')
-    count_game = 0
-    new_game = true
-    game = {}
-    games = []
-
-    file.each_line do |line|
-      if line.include?('InitGame')
-        new_game = true
-        count_game += 1
-        game = Game.new(count_game) 
-        games << game
-      elsif line.include?('ClientUserinfoChanged')
-        extract_player_config(line, game)
-      elsif line.include?('Kill')
-        extract_kill_line(line, game)
-      end
-      new_game = false  
-    end 
-    file.close
-    return games
-  end 
 
   def print_games
+    puts "************************************** Task 01 ****************************************************"
+    puts "***************************************************************************************************"
     games = read_log
     puts format_json_games(games)
+    puts "***************************************************************************************************"
+  end 
+
+  def print_rank_geral
+    puts "************************************** Task 02 ****************************************************"
+    puts "***************************************************************************************************"
+    kills_players_total
+    kills_players_by_game
+    puts "***************************************************************************************************"
+  end
+
+  def kills_players_total
+    players_total = rank_geral
+    players_total.select { |player|
+      puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+    }
+  end
+
+  def kills_players_by_game
+    games = read_log
+    games.select { |game|
+      puts "GAME_#{game.id}"
+      game.players.each { |player|
+        puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+      }
+    }
   end 
 
   def rank_geral
@@ -48,27 +53,24 @@ class Parserlog
     return players_ranking
   end 
 
-  def kills_players_by_game
-    games = read_log
-    games.select { |game|
-      puts "GAME_#{game.id}"
-      game.players.each { |player|
-        puts  "PLAYER  #{player.name} #{player.kills} KILLS"
-      }
-    }
-  end 
+  def read_log
+    file = File.open('games.log', 'r')
+    game = {}
+    games = []
 
-  def kills_players_total
-    players_total = rank_geral
-    players_total.select { |player|
-      puts  "PLAYER  #{player.name} #{player.kills} KILLS"
-    }
+    file.each_line do |line|
+      if line.include?('InitGame')
+        game = Game.new(games.size) 
+        games << game
+      elsif line.include?('ClientUserinfoChanged')
+        extract_player_config(line, game)
+      elsif line.include?('Kill')
+        extract_kill_line(line, game)
+      end
+    end 
+    file.close
+    return games
   end
-    
-  def print_rank_geral
-    kills_players_total
-    kills_players_by_game
-  end  
 
   def extract_kill_line(line, game)
     kill_dados = line.split("Kill: ")
@@ -76,11 +78,6 @@ class Parserlog
     cod_killed = kill_dados[1].split(" ")[1]
     game.process_kill(cod_killer, cod_killed)
   end
-    
-  def process_player(id, name, game)
-    player = Player.new(id, name)
-    game.add_player(player)
-  end   
 
   def extract_player_config(line, game)
     user = line.split("ClientUserinfoChanged: ")
@@ -101,6 +98,11 @@ class Parserlog
     }
     return JSON.pretty_generate(games_objs)
   end 
+    
+  def process_player(id, name, game)
+    player = Player.new(id, name)
+    game.add_player(player)
+  end
 
 end  
 

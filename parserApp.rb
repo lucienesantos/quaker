@@ -6,3 +6,4 @@ require File.expand_path('parserlog.rb')
  
  b = Parserlog.new
  b.print_games
+ b.print_rank_geral

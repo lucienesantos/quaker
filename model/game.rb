@@ -34,8 +34,7 @@ class Game
 
   def total_kills 
     players.inject(0){|total_kills, player|
-      total_kills += player.kills
-    }
+      total_kills += player.kills }
   end  
 
   def players_formated
