@@ -6,19 +6,37 @@ class Game
   def initialize(id)
     @id = id
     @players = []
+  end 
+
+  def means_of_death_formated
+    means = {}
+    self.players.select { |p| 
+      p.kills.map {|e| Kill.means_of_death[e.means.to_i] }
+       .each { |k|
+        if exists_means_by_name(k, means)
+          means[k] = means[k] + 1
+        else
+           means[k] = 1
+         end
+      }
+    }
+    return means
   end
 
-  def process_kill(cod_killer, cod_killed)
-    if cod_killer == COD_WORLD_KILLER
+  def process_kill(killer_id, killed_id, mean_of_death)
+    kill = Kill.new(killed_id, killer_id, mean_of_death)
+    if killer_id == COD_WORLD_KILLER
       self.players.select { |player| 
-        if player.id == cod_killed
-          player.kills = player.remove_kill
+        if player.id == killed_id
+          player.kills << kill
+          player.remove_kill_valids 
         end  
       }  
     else
-      self.players.select { |player|
-        if player.id == cod_killer
-          player.kills = player.add_kill
+      self.players.select { |player| 
+        if player.id == killer_id
+          player.kills << kill
+          player.add_kill_valids
         end
       }
     end
@@ -32,19 +50,19 @@ class Game
     end
   end 
 
-  def total_kills 
+  def total_kills_valids
     players.inject(0){|total_kills, player|
-      total_kills += player.kills }
+      total_kills += player.kills_valids }
   end  
 
   def players_formated
     players.map { |player| player.name }    
   end 
 
-  def kills_by_player
-    kills = {}
-    players.each { |player| kills[player.name] = player.kills }
-    return kills
+  def kills_valids_by_player
+    kills_valids = {}
+    players.each { |player| kills_valids[player.name] = player.kills_valids }
+    return kills_valids
   end 
 
   def add(player)
@@ -55,8 +73,12 @@ class Game
     players.find { |p| p.id == player.id }.name  = player.name
   end
 
+  def exists_means_by_name(elemento, list)
+    list.select { |p| p.eql? elemento }.any?
+  end
+  
   def exists(player)
     players.select { |p| p.id.eql? player.id }.any?
-  end  
+  end 
 
 end

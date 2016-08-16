@@ -1,48 +1,63 @@
 class Parserlog
 
 
-  def print_games
+  def print_games(file_path)
     puts "************************************** Task 01 ****************************************************"
     puts "***************************************************************************************************"
-    games = read_log
+    games = read_log(file_path)
     puts format_json_games(games)
     puts "***************************************************************************************************"
   end 
 
-  def print_rank_geral
+  def print_rank_geral(file_path)
     puts "************************************** Task 02 ****************************************************"
     puts "***************************************************************************************************"
-    kills_players_total
-    kills_players_by_game
+    kills_valids_players_total(file_path)
+    kills_valids_players_by_game(file_path)
     puts "***************************************************************************************************"
   end
 
-  def kills_players_total
-    players_total = rank_geral
+  def print_means_of_death(file_path)
+    puts "************************************** Task 03 ****************************************************"
+    puts "***************************************************************************************************"
+    means_of_death_by_game(file_path)
+    puts "***************************************************************************************************"
+  end
+
+  def means_of_death_by_game(file_path)
+    games = read_log(file_path)
+    games.select { |game|
+      puts "GAME_#{game.id}"
+      puts game.means_of_death_formated
+    }
+  end  
+
+  def kills_valids_players_total(file_path)
+    players_total = rank_geral(file_path)
     players_total.select { |player|
-      puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+      puts  "PLAYER  #{player.name} #{player.kills_valids} KILLS"
     }
   end
 
-  def kills_players_by_game
-    games = read_log
+  def kills_valids_players_by_game(file_path)
+    games = read_log(file_path)
     games.select { |game|
       puts "GAME_#{game.id}"
       game.players.each { |player|
-        puts  "PLAYER  #{player.name} #{player.kills} KILLS"
+        puts  "PLAYER  #{player.name} #{player.kills_valids} KILLS"
       }
     }
   end 
 
-  def rank_geral
-    games = read_log
+  def rank_geral(file_path)
+    games = read_log(file_path)
     players_ranking = []
     games.select { |game|
       game.players.select { |player|
         if player.exists_by_name(player, players_ranking)
           players_ranking.select { |p|
             if p.name == player.name
-              p.kills += player.kills
+              p.kills_valids += player.kills_valids
             end  
           }
         else
@@ -53,8 +68,8 @@ class Parserlog
     return players_ranking
   end 
 
-  def read_log
-    file = File.open('games.log', 'r')
+  def read_log(file_path)
+    file = File.open(file_path, 'r')
     game = {}
     games = []
 
@@ -74,9 +89,11 @@ class Parserlog
 
   def extract_kill_line(line, game)
     kill_dados = line.split("Kill: ")
-    cod_killer = kill_dados[1].split(" ")[0]
-    cod_killed = kill_dados[1].split(" ")[1]
-    game.process_kill(cod_killer, cod_killed)
+    killer_id = kill_dados[1].split(" ")[0]
+    killed_id = kill_dados[1].split(" ")[1]
+    mean_of_death = kill_dados[1].split(" ")[2]
+    game.process_kill(killer_id, killed_id, mean_of_death)
+
   end
 
   def extract_player_config(line, game)
@@ -90,9 +107,9 @@ class Parserlog
     games_objs = {}
     games.each { |game|
       game_obj = { 
-        :total_kills => game.total_kills,
+        :total_kills => game.total_kills_valids,
         :players => game.players_formated,
-        kills: game.kills_by_player 
+        kills: game.kills_valids_by_player 
       }
       games_objs["game_ #{game.id}"] = game_obj
     }

@@ -1,19 +1,20 @@
 class Player
 
-  attr_accessor :id, :name, :kills
+  attr_accessor :id, :name, :kills, :kills_valids
 
   def initialize(id, name)
     @id = id
     @name = name
-    @kills = 0
+    @kills = []
+    @kills_valids  = 0
   end  
 
-  def add_kill
-    @kills = @kills + 1 
+  def add_kill_valids
+    @kills_valids = @kills_valids + 1 
   end
 
-  def remove_kill
-    @kills = @kills - 1 
+  def remove_kill_valids
+    @kills_valids = @kills_valids - 1 
   end
  
   def exists_by_name(player, list)
